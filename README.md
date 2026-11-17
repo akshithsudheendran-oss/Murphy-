@@ -36,7 +36,7 @@ This tool is for **educational and authorized testing only**. Scanning websites 
 ### 2. Clone the repository
 
 git clone https://github.com/akshithsudheendran-oss/murphy.git
-https://github.com/avaishnavip404/murphy.git
+https://github.com/vaishnavip404/murphy.git
 cd murphy
 
 
