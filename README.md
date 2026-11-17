@@ -86,7 +86,7 @@ Ensure pdo_mysql is enabled in your php.ini and restart Apache.
 
 
 ### 7. Run the App
-python app.py
+run python app.py
 Open url in your browser. Register an account, log in, and scan http://localhost/dvwa.
 
 
