@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register — Murphy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .pw-meter { height: 6px; background: #21262d; border-radius: 3px; overflow: hidden; margin-top: 6px; }
+        .pw-meter-fill { height: 100%; width: 0%; background: #f85149; transition: all 0.25s ease; }
+        .pw-hints { list-style: none; font-size: 0.8rem; margin-top: 8px; padding: 0; }
+        .pw-hints li { color: #8b949e; margin: 2px 0; padding-left: 18px; position: relative; }
+        .pw-hints li::before { content: "○"; position: absolute; left: 4px; color: #8b949e; }
+        .pw-hints li.ok { color: #3fb950; }
+        .pw-hints li.ok::before { content: "✓"; color: #3fb950; }
+        .field-error { color: #f85149; font-size: 0.8rem; margin-top: 4px; display: none; }
+        .field-error.show { display: block; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('index') }}" class="logo">Murphy</a>
+        </div>
+    </nav>
+
+    <main class="container section">
+        <div class="auth-container">
+            <div class="card auth-card">
+                <h2 class="text-center">Create Account</h2>
+
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
+
+                <form method="POST" action="{{ url_for('register') }}" id="registerForm" novalidate>
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" required
+                               minlength="3" maxlength="30"
+                               pattern="[A-Za-z0-9_.\-]+"
+                               placeholder="3–30 chars: letters, numbers, . _ -">
+                        <div class="field-error" id="usernameError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" required
+                               maxlength="254"
+                               placeholder="name@example.com">
+                        <div class="field-error" id="emailError"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required
+                               minlength="8" maxlength="128"
+                               placeholder="Min 8 chars, mix letters/numbers/symbols"
+                               autocomplete="new-password">
+                        <div class="pw-meter"><div class="pw-meter-fill" id="pwFill"></div></div>
+                        <ul class="pw-hints">
+                            <li id="h-len">At least 8 characters</li>
+                            <li id="h-upper">One uppercase letter (A–Z)</li>
+                            <li id="h-lower">One lowercase letter (a–z)</li>
+                            <li id="h-num">One number (0–9)</li>
+                            <li id="h-sym">One symbol (!@#$%^&amp;* etc.)</li>
+                        </ul>
+                        <div class="field-error" id="passwordError"></div>
+                    </div>
+
+                    <button type="submit" class="btn-primary btn-block">Create Account</button>
+                </form>
+
+                <p class="text-center mt-1">
+                    Already have an account? <a href="{{ url_for('login') }}">Login here</a>.
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container"><p>&copy; Developed by Vaishnavi & Akshith - BCA Minor Project</p></div>
+    </footer>
+
+    <script>
+    (function () {
+        const form = document.getElementById('registerForm');
+        const username = document.getElementById('username');
+        const email = document.getElementById('email');
+        const password = document.getElementById('password');
+
+        const usernameError = document.getElementById('usernameError');
+        const emailError = document.getElementById('emailError');
+        const passwordError = document.getElementById('passwordError');
+
+        const pwFill = document.getElementById('pwFill');
+        const hints = {
+            len:   document.getElementById('h-len'),
+            upper: document.getElementById('h-upper'),
+            lower: document.getElementById('h-lower'),
+            num:   document.getElementById('h-num'),
+            sym:   document.getElementById('h-sym'),
+        };
+
+        const emailRe = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        const userRe  = /^[A-Za-z0-9_.\-]{3,30}$/;
+
+        function setHint(el, ok) {
+            el.classList.toggle('ok', ok);
+        }
+
+        function updatePassword() {
+            const v = password.value;
+            const c = {
+                len:   v.length >= 8,
+                upper: /[A-Z]/.test(v),
+                lower: /[a-z]/.test(v),
+                num:   /[0-9]/.test(v),
+                sym:   /[^A-Za-z0-9]/.test(v),
+            };
+            Object.keys(hints).forEach(k => setHint(hints[k], c[k]));
+
+            const score = Object.values(c).filter(Boolean).length;
+            const pct = (score / 5) * 100;
+            pwFill.style.width = pct + '%';
+            pwFill.style.background = score <= 2 ? '#f85149'
+                                    : score === 3 ? '#d29922'
+                                    : score === 4 ? '#79c0ff'
+                                    : '#3fb950';
+        }
+
+        password.addEventListener('input', updatePassword);
+        updatePassword();
+
+        form.addEventListener('submit', function (e) {
+            let ok = true;
+
+            // username
+            usernameError.classList.remove('show');
+            if (!userRe.test(username.value.trim())) {
+                usernameError.textContent = 'Username must be 3–30 chars: letters, numbers, . _ -';
+                usernameError.classList.add('show');
+                ok = false;
+            }
+
+            // email
+            emailError.classList.remove('show');
+            if (!emailRe.test(email.value.trim())) {
+                emailError.textContent = 'Enter a valid email like name@example.com';
+                emailError.classList.add('show');
+                ok = false;
+            }
+
+            // password
+            passwordError.classList.remove('show');
+            const v = password.value;
+            const pwOk = v.length >= 8 && /[A-Z]/.test(v) && /[a-z]/.test(v)
+                         && /[0-9]/.test(v) && /[^A-Za-z0-9]/.test(v);
+            if (!pwOk) {
+                passwordError.textContent = 'Password does not meet all requirements above.';
+                passwordError.classList.add('show');
+                ok = false;
+            }
+
+            if (!ok) e.preventDefault();
+        });
+    })();
+    </script>
+</body>
+</html>

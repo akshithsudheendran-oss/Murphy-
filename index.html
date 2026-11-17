@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Murphy — Web Vulnerability Scanner</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('index') }}" class="logo">Murphy</a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Scan</a></li>
+                <li><a href="{{ url_for('history') }}">History</a></li>
+                {% if current_user %}
+                    <li><span class="text-muted">Hi, {{ current_user.username }}</span></li>
+                    <li><a href="{{ url_for('logout') }}" class="btn-outline">Logout</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
+                    <li><a href="{{ url_for('register') }}" class="btn-primary">Register</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="container hero-inner">
+            <h1 class="hero-title">Murphy</h1>
+            <p class="hero-subtitle">
+                An automated, lightweight Dynamic Application Security Testing (DAST) scanner
+                that evaluates the attack surface of web applications from an external perspective.
+            </p>
+            <div class="hero-cta">
+                <a href="{{ url_for('dashboard') }}" class="btn-primary btn-large">Start Scanning</a>
+                <a href="{{ url_for('register') }}" class="btn-outline btn-large">Create Account</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- WHAT MURPHY DOES -->
+    <section class="container section">
+        <h2 class="section-title">What Murphy Does</h2>
+        <p class="section-subtitle">
+            Murphy runs five independent security modules against a target URL and reports findings with severity levels.
+        </p>
+
+        <div class="feature-grid">
+            <div class="feature-card card">
+                <div class="feature-icon" style="font-size: 1.4rem; font-weight: bold; color: var(--accent-color); letter-spacing: 1px;">SQLi</div>
+                <h3>SQL Injection</h3>
+                <p>Tests URL parameters with common payloads and detects database error signatures.</p>
+            </div>
+            <div class="feature-card card">
+                <div class="feature-icon" style="font-size: 1.4rem; font-weight: bold; color: var(--accent-color); letter-spacing: 1px;">XSS</div>
+                <h3>Cross-Site Scripting</h3>
+                <p>Injects script payloads into inputs and checks if they reflect unescaped in the response.</p>
+            </div>
+            <div class="feature-card card">
+                <div class="feature-icon" style="font-size: 1.4rem; font-weight: bold; color: var(--accent-color); letter-spacing: 1px;">HTTP</div>
+                <h3>Security Headers</h3>
+                <p>Verifies presence of HSTS, CSP, X-Frame-Options, and X-Content-Type-Options.</p>
+            </div>
+            <div class="feature-card card">
+                <div class="feature-icon" style="font-size: 1.4rem; font-weight: bold; color: var(--accent-color); letter-spacing: 1px;">PORT</div>
+                <h3>Port Scanner</h3>
+                <p>Checks common ports (21, 22, 80, 443, 3306, 8080) for unexpected exposure.</p>
+            </div>
+            <div class="feature-card card">
+                <div class="feature-icon" style="font-size: 1.4rem; font-weight: bold; color: var(--accent-color); letter-spacing: 1px;">PATH</div>
+                <h3>Admin Panel Finder</h3>
+                <p>Probes common admin paths (<code>/admin</code>, <code>/wp-admin</code>, <code>/phpmyadmin</code>).</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="container section">
+        <h2 class="section-title">How It Works</h2>
+        <div class="steps">
+            <div class="step card">
+                <span class="step-num">1</span>
+                <h3>Enter URL</h3>
+                <p>Paste the target website URL you own or have permission to test.</p>
+            </div>
+            <div class="step card">
+                <span class="step-num">2</span>
+                <h3>Automated Scan</h3>
+                <p>Five modules run in sequence — SQLi, XSS, Headers, Ports, Admin Finder.</p>
+            </div>
+            <div class="step card">
+                <span class="step-num">3</span>
+                <h3>Get Report</h3>
+                <p>View findings with severity and download a PDF report for your records.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ETHICAL DISCLAIMER -->
+    <section class="container section">
+        <div class="disclaimer card">
+            <h3>Ethical Disclaimer</h3>
+            <p>
+                Murphy is for <strong>educational and authorized testing only</strong>.
+                Scanning websites without explicit permission is illegal under the IT Act, 2000
+                and similar laws worldwide. Only test sites you own or have written consent to test.
+            </p>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer>
+        <div class="container">
+            <p><strong>Murphy</strong> — Web Vulnerability Scanner</p>
+            <p>&copy; Developed by Vaishnavi & Akshith - BCA Minor Project</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

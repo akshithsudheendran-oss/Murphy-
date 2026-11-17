@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error — Murphy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('index') }}" class="logo">Murphy</a>
+        </div>
+    </nav>
+
+    <main class="container section">
+        <div class="card text-center">
+            <h1 style="color: var(--crit-color);">Oops! Something went wrong.</h1>
+            <p class="mt-1">{{ error_message | default("An unexpected error occurred.") }}</p>
+            <a href="{{ url_for('dashboard') }}" class="btn-primary mt-2">Return to Dashboard</a>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container"><p>&copy; Developed by Vaishnavi & Akshith - BCA Minor Project/p></div>
+    </footer>
+</body>
+</html>

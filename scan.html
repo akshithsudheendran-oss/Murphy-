@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scan — Murphy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('index') }}" class="logo">Murphy</a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Scan</a></li>
+                <li><a href="{{ url_for('history') }}">History</a></li>
+                {% if current_user %}
+                    <li><span class="text-muted">Hi, {{ current_user.username }}</span></li>
+                    <li><a href="{{ url_for('logout') }}" class="btn-outline">Logout</a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container section">
+        <h2>Welcome, {{ current_user.username if current_user else 'Guest' }}</h2>
+        <p class="text-muted">Enter a target URL to begin scanning.</p>
+
+        <div class="dashboard-grid mt-2">
+            <!-- SCAN AREA -->
+            <div class="scan-area card">
+                <h3>Start Scan</h3>
+                <p>Enter the full URL of the target application.</p>
+
+                <form id="scanForm" class="mt-1">
+                    <div class="form-group">
+                        <input type="url" id="targetUrl" name="targetUrl" required
+                               placeholder="https://example.com" class="large-input">
+                    </div>
+                    <button type="submit" id="startScanBtn" class="btn-primary btn-large">
+                        Start Security Scan
+                    </button>
+                </form>
+
+                <!-- Progress UI -->
+                <div id="progressContainer" class="mt-2 hidden">
+                    <h4 id="statusText">Initializing Scan...</h4>
+                    <div class="progress-bar-bg">
+                        <div id="progressBar" class="progress-bar-fill"></div>
+                    </div>
+                    <ul id="scanLogs" class="scan-logs"></ul>
+                </div>
+            </div>
+
+            <!-- RECENT SCANS SIDEBAR -->
+            <div class="recent-scans card">
+                <h3>Recent Scans</h3>
+                {% if recent_scans %}
+                    <ul class="scan-list">
+                        {% for s in recent_scans %}
+                            <li>
+                                <a href="{{ url_for('results', scan_id=s.id) }}" class="scan-link">
+                                    <span class="scan-target">{{ s.target_url }}</span>
+                                    <span class="scan-date">{{ s.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">No recent scans. Start one now!</p>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Only scan sites you own or have permission to test.</p>
+            <p>&copy; Developed by Vaishnavi & Akshith - BCA Minor Project</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/scan.js') }}"></script>
+</body>
+</html>

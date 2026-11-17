@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Results — Murphy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('index') }}" class="logo">Murphy</a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Scan</a></li>
+                <li><a href="{{ url_for('history') }}">History</a></li>
+                <li><a href="{{ url_for('logout') }}" class="btn-outline">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container section">
+        <div class="results-header card">
+            <div class="flex-between">
+                <div>
+                    <h2>Scan Results</h2>
+                    <p class="break-word"><strong>Target:</strong> {{ scan.target_url }}</p>
+                    <p class="text-muted">Scanned on: {{ scan.created_at }}</p>
+                </div>
+                <div class="action-buttons">
+                    <a href="{{ url_for('download_report', scan_id=scan.id) }}" class="btn-primary">Download PDF</a>
+                    <a href="{{ url_for('dashboard') }}" class="btn-outline">Scan Another</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="summary-grid mt-2">
+            <div class="stat-card card">
+                <h3>Total Findings</h3>
+                <div class="stat-number">{{ scan.total_vulnerabilities }}</div>
+            </div>
+            <div class="chart-card card">
+                <h3>Severity Breakdown</h3>
+                <div id="chart-data-holder"
+                     data-critical="{{ scan.critical_count | default(0) }}"
+                     data-high="{{ scan.high_count | default(0) }}"
+                     data-medium="{{ scan.medium_count | default(0) }}"
+                     data-low="{{ scan.low_count | default(0) }}">
+                </div>
+                <canvas id="severityChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="detailed-results card mt-2">
+            <h3>Detailed Findings</h3>
+
+            {% if vulnerabilities %}
+                <div class="table-responsive">
+                    <table class="vuln-table">
+                        <thead>
+                            <tr>
+                                <th>Severity</th>
+                                <th>Type</th>
+                                <th>Affected URL</th>
+                                <th>Description</th>
+                                <th>Remediation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vuln in vulnerabilities %}
+                                <tr>
+                                    <td>
+                                        <span class="badge badge-{{ vuln.severity.lower() }}">
+                                            {{ vuln.severity }}
+                                        </span>
+                                    </td>
+                                    <td><strong>{{ vuln.vuln_type }}</strong></td>
+                                    <td class="break-word">{{ vuln.affected_url }}</td>
+                                    <td>{{ vuln.description }}</td>
+                                    <td class="text-muted">{{ vuln.remediation }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-success mt-1">
+                    🎉 No vulnerabilities detected! The application appears secure against tested payloads.
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Only scan sites you own or have permission to test.</p>
+            <p>&copy; Developed by Vaishnavi & Akshith - BCA Minor Project</p>
+        </div>
+    </footer>
+
+    <script>
+        const holder = document.getElementById('chart-data-holder');
+        const ctx = document.getElementById('severityChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Critical', 'High', 'Medium', 'Low'],
+                datasets: [{
+                    data: [
+                        parseInt(holder.dataset.critical, 10) || 0,
+                        parseInt(holder.dataset.high, 10) || 0,
+                        parseInt(holder.dataset.medium, 10) || 0,
+                        parseInt(holder.dataset.low, 10) || 0
+                    ],
+                    backgroundColor: ['#f85149', '#ff7b72', '#d2a8ff', '#79c0ff'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: { color: '#c9d1d9' } } }
+            }
+        });
+    </script>
+</body>
+</html>

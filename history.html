@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History — Murphy</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="{{ url_for('index') }}" class="logo">Murphy</a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('dashboard') }}">Scan</a></li>
+                <li><a href="{{ url_for('history') }}">History</a></li>
+                <li><a href="{{ url_for('logout') }}" class="btn-outline">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="container section">
+        <div class="card">
+            <h2>Scan History</h2>
+            <p class="text-muted">View all previous scans performed on your account.</p>
+
+            {% if scans %}
+                <div class="table-responsive mt-2">
+                    <table class="vuln-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Target URL</th>
+                                <th>Status</th>
+                                <th>Total Issues</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for scan in scans %}
+                                <tr>
+                                    <td>{{ scan.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                    <td class="break-word">{{ scan.target_url }}</td>
+                                    <td>
+                                        <span class="badge badge-{{ 'success' if scan.scan_status == 'completed' else 'warning' }}">
+                                            {{ scan.scan_status }}
+                                        </span>
+                                    </td>
+                                    <td>{{ scan.total_vulnerabilities }}</td>
+                                    <td>
+                                        <a href="{{ url_for('results', scan_id=scan.id) }}" class="btn-outline btn-small">View</a>
+                                        <a href="{{ url_for('download_report', scan_id=scan.id) }}" class="btn-primary btn-small">PDF</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mt-2">
+                    You haven't run any scans yet. Head over to the <a href="{{ url_for('dashboard') }}">Scan page</a> to start.
+                </div>
+            {% endif %}
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>Only scan sites you own or have permission to test.</p>
+            <p>&copy; Developed by Vaishnavi & Akshith - BCA Minor Project</p>
+        </div>
+    </footer>
+</body>
+</html>

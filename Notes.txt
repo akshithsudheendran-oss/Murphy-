@@ -1,0 +1,117 @@
+=========================================================
+MURPHY PROJECT — HANDOFF NOTES
+Last updated: 2026-10-04
+=========================================================
+
+=== PROJECT ===
+Final-year BCA project: "Murphy" — Web Vulnerability Scanner
+Backend: Akshith (Flask + MySQL + Python scanners)
+Frontend: Vaishnavi (HTML/CSS/JS in templates/ and static/)
+
+=== TECH STACK ===
+- Python 3.x + Flask
+- MySQL 8.0 (database: murphy_db)
+- Templates: Jinja2
+- Charts: Chart.js (CDN)
+- Test target: DVWA at http://localhost/dvwa
+
+=== FOLDER STRUCTURE ===
+C:\Akshith\Internship\Murphy\
+├── app.py                    (Flask routes - working)
+├── config.py                 (DB config - working)
+├── .env                      (DB creds + secret key)
+├── test_db.py                (DB connection test - passes)
+├── requirements.txt
+├── venv\
+├── database\
+│   ├── __init__.py
+│   └── db.py                 (MySQL connection helper)
+├── scanner\
+│   ├── __init__.py
+│   ├── header_checker.py     (DONE - works)
+│   └── sqli_scanner.py       (just created - 0 findings, needs fix)
+├── models\
+│   └── __init__.py
+├── reports\
+│   └── __init__.py
+├── static\
+│   ├── css\style.css
+│   └── js\scan.js, main.js
+└── templates\
+    ├── index.html, scan.html, results.html,
+    ├── history.html, login.html, register.html, error.html
+
+=== DATABASE ===
+Database: murphy_db
+Tables:
+  users (id, username, email, password_hash, created_at)
+  scans (id, user_id, target_url, scan_status, total_vulnerabilities,
+         critical_count, high_count, medium_count, low_count,
+         report_path, created_at)
+  vulnerabilities (id, scan_id, vuln_type, severity, description,
+                   payload_used, affected_url, remediation, created_at)
+
+
+=== DVWA SETUP ===
+Location: C:\xampp\htdocs\dvwa\
+Login: admin / password
+Security Level: Low
+Fixed MySQL compatibility in: dvwa\includes\DBMS\MySQL.php
+  (removed "IF NOT EXISTS" from two ALTER TABLE statements)
+
+Test URLs:
+  SQLi: http://localhost/dvwa/vulnerabilities/sqli/?id=1&Submit=Submit
+  XSS:  http://localhost/dvwa/vulnerabilities/xss_r/?name=test
+
+XAMPP: Apache running, MySQL STOPPED (uses existing MySQL on 3306)
+
+=== WHAT WORKS ===
+- Flask app serves all pages with correct dark theme
+- MySQL connection: python test_db.py -> passes
+- header_checker.py: scans real URLs, finds missing headers
+- DVWA running locally, login successful
+- UI loads: /, /dashboard, /history, /results, /login, /register
+
+=== CURRENT PROBLEM ===
+scanner/sqli_scanner.py returns 0 findings on DVWA SQLi page
+(expected: multiple findings - DVWA is intentionally vulnerable)
+
+Possible causes:
+  1. DVWA SQLi page requires session cookie (logged-in user)
+  2. scan_sqli() sends requests without authentication
+  3. Detection logic too strict
+
+Next step: Add session/cookie handling OR use requests.Session()
+with DVWA login, then re-test.
+
+=== WHAT REMAINS ===
+1. Fix scanner/sqli_scanner.py (findings detection)
+2. Create scanner/xss_scanner.py
+3. Create scanner/port_scanner.py
+4. Create scanner/admin_finder.py
+5. Create models/user.py (register/login DB queries)
+6. Create models/scan.py (save scans + vulnerabilities)
+7. Create reports/pdf_generator.py (ReportLab)
+8. Wire real scanners into app.py
+9. Replace dummy data with real DB queries
+10. Test end-to-end: register -> login -> scan -> results -> PDF
+
+=== KEY COMMANDS ===
+Activate venv:
+  cd C:\Akshith\Internship\Murphy
+  venv\Scripts\activate
+
+Run Flask:
+  python app.py
+
+Run header checker:
+  python scanner/header_checker.py
+
+Run SQLi scanner:
+  python scanner/sqli_scanner.py
+
+Connect to MySQL:
+  mysql -u root -p
+
+Backup DB:
+  mysqldump -u root -p murphy_db > murphy_db_backup.sql
